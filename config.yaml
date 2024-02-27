@@ -1,0 +1,48 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: set MOTD variable
+    set_fact:
+      motd_text: "{{ motd_text | default('Ansible Managed node by njmarquez') }}"
+
+  - name: MOTD
+    template:
+      src: motd.j2
+      dest: /etc/motd
+
+  - name: install latest version of python3 and pip3 in Ubuntu
+    apt:
+      name:
+        - python3
+        - python3-pip
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install latest version of python3 and pip3 in CentOS
+    dnf:
+      name:
+        - python3
+        - python3-pip
+      state: latest
+    when: ansible_distribution == "CentOS"
+
+  - name: Set python3 as default python in CentOS
+    ansible.builtin.command: alias python3=/user/bin/python3
+    when: ansible_distribution  == "Centos"
+
+  - name: Set pip3 as default pip in CentOS
+    ansible.builtin.command: alias python3=/user/bin/python3
+    when: ansible_distribution  == "CentOS"
+
+  - name: install latest version Java open-jdk in Ubuntu
+    apt:
+      name: openjdk-11-jdk
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install latest version Java open-jdk in CentOS
+    dnf:
+      name: java-11-openjdk-devel
+      state: latest
+    when: ansible_distribution == "CentOS"
